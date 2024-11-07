@@ -169,7 +169,7 @@ def create_html_ipo(data):
         return html
 
     html = '<table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">'
-    html += '<tr><th>Company Name</th><th>Price</th><th>GMP</th><th>Est Listing</th><th>IPO Size</th><th>LOT</th></tr>'
+    html += '<tr><th>Company Name</th><th>Price</th><th>GMP</th><th>Est Listing</th><th>IPO Size</th><th>Lot</th></tr>'
     
     for item in data:
         html += '<tr>'

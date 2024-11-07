@@ -1,0 +1,25 @@
+name: Daily Script
+
+on:
+  schedule:
+    - cron: "30 10 * * *"  # Runs at 10:30 AM UTC daily
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python environment
+        run: |
+          apt-get update && \
+          apt-get install python3 -y && \
+          apt-get install python3-pip -y && \
+          python3 -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip install beautifulsoup4
+
+      - name: Run the Python script
+        run: python3 script.py

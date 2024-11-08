@@ -1,9 +1,11 @@
+import os
 import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import requests
 from bs4 import BeautifulSoup 
+from dotenv import load_dotenv
 
 def fetch_data():
     try:
@@ -185,10 +187,12 @@ def create_html_ipo(data):
     return html
 
 def send_email(recipient_name, html_table, html_table_ipo):
-    sender_email = 'testing3122001@gmail.com'
-    recipient_email = 'gogeta3122001@gmail.com'
+    sender_email = os.getenv('SENDER_EMAIL')
+    recipient_email = os.getenv('RECIPIENT_EMAIL')
+    password = os.getenv('MY_PASSWORD')
     email_subject = 'The stocks for today:'
-    password = "xhpc awmk bxtx ejrt"
+    if not password:
+        raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
 
     html_body = f"""
     <div style="text-align:center">
@@ -220,6 +224,8 @@ def send_email(recipient_name, html_table, html_table_ipo):
 
 if __name__ == "__main__":
     recipient_name = 'Kaushal'
+    # Load environment variables from the .env file
+    load_dotenv()
 
     # Fetch stock data
     stock_data_ipo = fetch_data_ipo()
@@ -227,10 +233,10 @@ if __name__ == "__main__":
     # Generate the HTML table based on the data
     html_table_ipo = create_html_ipo(stock_data_ipo)
 
-    # # Fetch stock data
+    # Fetch stock data
     stock_data = fetch_data()
 
-    # # Generate the HTML table based on the data
+    # Generate the HTML table based on the data
     html_table = create_html_table(stock_data)
 
     # Send email with the generated table

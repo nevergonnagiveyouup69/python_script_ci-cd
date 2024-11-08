@@ -17,6 +17,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:  # Add secrets as environment variables
+      MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+      SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+      RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.10

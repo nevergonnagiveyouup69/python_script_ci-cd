@@ -32,7 +32,7 @@ jobs:
       run: |
           pip install requests
           pip install beautifulsoup4
-          pip install dotenv
+          pip install python3-dotenv
 
     - name: Run the Python script
       run: python3 script.py

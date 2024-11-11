@@ -121,7 +121,7 @@ def fetch_data_ipo():
                 company_name = re.sub(r'Open\s*\(', ' Open (', re.sub(r'IPOUpcoming', 'IPO Upcoming',cols[0].text.strip().replace('[email\xa0protected]', '')))
         
                 # Extract the percentage value within parentheses
-                match = re.sub(r'.*\d*\s\(', '', re.sub(r'%*\s*\)', '',cols[3].text.strip()))
+                match = re.sub(r'--','0',re.sub(r'.*\d*\s\(', '', re.sub(r'%*\s*\)', '',cols[3].text.strip())))
                 if round(float(match)) > 1:
 
                     if "Open" in company_name or "Upcoming" in company_name:

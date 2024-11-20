@@ -193,17 +193,70 @@ def send_email(recipient_name, html_table, html_table_ipo):
     email_subject = 'The stocks for today:'
     if not password:
         raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
+ 
+    stock_data_ipo = len(fetch_data_ipo())
+    stock_data = len(fetch_data())
+
+    green= "#20B2AA"
+    blue = "#0044cc"
+    red = "#C21807"
+
+    if stock_data_ipo > 3 or stock_data > 3:
+        stock_data_color = green
+    elif stock_data_ipo == 0 and stock_data == 0:
+        stock_data_color = red
+    else:
+        stock_data_color = blue
 
     html_body = f"""
-    <div style="text-align:center">
-        <p align="left">Hi {recipient_name or 'All'},</p>
-        {html_table}
-        <p><br></p>
-        <p align="center">IPO's for Today</p>
-        {html_table_ipo}
-        <p align="left">Thanks and Regards,<br>NSE Trading India</p>
-    </div>
-    """
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;">
+            <div style="max-width: 600px; margin: 20px auto; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+
+                <!-- Header Section -->
+                <div style="background-color: {stock_data_color}; color: white; padding: 15px; text-align: center;">
+                    <h2 style="margin: 0;">NSE Trading India</h2>
+                    <p style="margin: 5px 0 0;">Your Trusted Partner in Trading</p>
+                </div>
+
+                <!-- Body Section -->
+                <div style="padding: 20px;">
+                    <p style="margin: 0; text-align: left;">Hi {recipient_name or 'All'},</p>
+                    <p style="margin: 10px 0; text-align: left;">
+                        We’re sharing the latest updates and insights in trading. Please find the details below:
+                    </p>
+
+                    <!-- First Table Section -->
+                    <div id="market-updates-section" style="margin: 20px 0; overflow-x: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+                        <h4 style="margin: 0 0 10px;">Market Updates</h4>
+                        {html_table}
+                    </div>
+
+                    <!-- Second Table Section -->
+                    <div id="ipo-updates-section" style="margin: 20px 0; overflow-x: auto; border: 1px solid {stock_data_color}; padding: 10px; border-radius: 4px; background-color: {stock_data_color};">
+                        <h4 style="margin: 0 0 10px;">IPO Updates</h4>
+                        {html_table_ipo}
+                    </div>
+
+                    <p style="text-align: left; margin: 20px 0;">
+                        We hope you find this information useful. If you have any questions or need assistance, feel free to reach out to us.
+                    </p>
+
+                    <p style="text-align: left;">
+                        Thanks and Regards,<br>
+                        <strong>NSE Trading India</strong>
+                    </p>
+                </div>
+
+                <!-- Footer Section -->
+                <div style="background-color: #f4f4f4; color: #666; padding: 10px; text-align: center; font-size: 0.9em;">
+                    <p style="margin: 0;">This is an automated email. Please do not reply to this address.</p>
+                    <p style="margin: 5px 0 0;">© 2024 NSE Trading India. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>"""
 
     message = MIMEMultipart("alternative")
     message["From"] = sender_email

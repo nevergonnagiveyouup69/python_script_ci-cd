@@ -190,7 +190,7 @@ def send_email(recipient_name, html_table, html_table_ipo):
     sender_email = os.getenv('SENDER_EMAIL')
     recipient_email = os.getenv('RECIPIENT_EMAIL')
     password = os.getenv('MY_PASSWORD')
-    email_subject = 'The stocks for today:'
+    email_subject = "Daily Market Update"
     if not password:
         raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
  

@@ -7,7 +7,12 @@ import requests
 from bs4 import BeautifulSoup 
 from email.mime.base import MIMEBase
 from email import encoders
-from fetch import make_pdf
+
+# script.py
+def some_function():
+    from fetch import make_pdf
+    make_pdf()
+
 from dotenv import load_dotenv
 
 def fetch_data():
@@ -308,7 +313,8 @@ if __name__ == "__main__":
 
     # Generate the HTML table based on the data
     html_table = create_html_table(stock_data)
-    make_pdf()
+
+    some_function()
 
     # Send email with the generated table
     send_email(recipient_name, html_table, html_table_ipo)

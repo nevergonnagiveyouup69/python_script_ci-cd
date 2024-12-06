@@ -5,6 +5,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import requests
 from bs4 import BeautifulSoup 
+from email.mime.base import MIMEBase
+from email import encoders
+from fetch import make_pdf
 from dotenv import load_dotenv
 
 def fetch_data():
@@ -264,13 +267,27 @@ def send_email(recipient_name, html_table, html_table_ipo):
     message["Subject"] = email_subject
     message.attach(MIMEText(html_body, "html"))
 
-    try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(sender_email, password)
-        server.sendmail(sender_email, recipient_email, message.as_string())
-        print("Email sent successfully!")
-        server.quit()
+    pdf_path ='pdf/company_analysis_report.pdf'
+    # Attach PDF if provided
+    if pdf_path:
+        try:
+            with open(pdf_path, "rb") as pdf_file:
+                pdf_attachment = MIMEBase("application", "octet-stream")
+                pdf_attachment.set_payload(pdf_file.read())
+            encoders.encode_base64(pdf_attachment)
+            pdf_attachment.add_header(
+                "Content-Disposition",
+                f"attachment; filename={os.path.basename(pdf_path)}",
+            )
+            message.attach(pdf_attachment)
+        except Exception as e:
+            print(f"Error attaching PDF: {e}")
 
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, recipient_email, message.as_string())
+            print("Email sent successfully!")
     except Exception as e:
         print(f"Error sending email: {e}")
 
@@ -291,6 +308,7 @@ if __name__ == "__main__":
 
     # Generate the HTML table based on the data
     html_table = create_html_table(stock_data)
+    make_pdf()
 
     # Send email with the generated table
     send_email(recipient_name, html_table, html_table_ipo)

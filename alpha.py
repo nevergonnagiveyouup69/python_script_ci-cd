@@ -145,7 +145,7 @@ def get_company_url(value):
     model2 = genai.GenerativeModel("gemini-1.5-flash")
     response2 = model2.generate_content("Summarize the profitability of this investment in one word: 'Low,' 'Moderate,' 'High,' 'Very High,' or 'None'."+str(after_reports_items)+"fundamentals"+str(financial_data))
     profits = response2.text
-    print("Extraction Complete.\n")
+    print("Extraction Completed.\n")
     # print(financial_data)
     # print("profits:"+ profits)
     return profits, generated_text, financial_data

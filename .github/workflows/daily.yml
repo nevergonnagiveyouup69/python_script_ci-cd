@@ -37,10 +37,7 @@ jobs:
           pip install python-dotenv
           pip install google-generativeai
           pip install fpdf
-          pip install playwright
-
-    - name: Install Playwright browsers
-      run: playwright install
+          pip install googlesearch-python
 
     - name: Run the Python script
       run: python3 script.py

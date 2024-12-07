@@ -6,8 +6,6 @@ import re
 import google.generativeai as genai
 from googlesearch import search
 
-value = "D P Abhushan Ltd"
-
 def get_company_url(company_name):
     """
     Fetch the URL for the given company name from Finology.
@@ -103,5 +101,3 @@ def get_company_url(company_name):
             # print(financial_data)
             # print("profits:"+ profits)
             return profits, generated_text, financial_data
-
-get_company_url(value)

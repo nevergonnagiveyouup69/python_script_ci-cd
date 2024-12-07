@@ -1,50 +1,42 @@
+from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
 from bs4 import BeautifulSoup
 import requests
-# Example: Using requests to fetch the HTML content (you can replace this with your HTML content directly)  
-from playwright.sync_api import sync_playwright
-from playwright.sync_api import expect
 import random
 import os
 import re
 import google.generativeai as genai
-from playwright_stealth import stealth_sync
-
-
-
-# from sklearn.feature_extraction.text import CountVectorizer
-# from sklearn.metrics.pairwise import cosine_similarity
-# from nltk.metrics import edit_distance
 
 value = "D P Abhushan Ltd"
 
 def get_company_url(value):
-   
     """
     Fetch the URL for the given company name from Finology.
     """
+    base_url = None  # Initialize base_url to avoid unbound error
     try:
         with sync_playwright() as p:
-
             # Launch the browser
-            browser = playwright.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=False)
             context = browser.new_context()
             stealth_sync(context)
             page = context.new_page()
-            print("Starting server")
-            page = browser.new_page()
 
-            # Ticker list and preprocessing
-            ticker = ['RELIANCE', 'ITC', 'tcs', 'wipro', 'hcltech', 'TECHM', 'INFY', 'OFSS', 
-                    'HDFCBANK', 'ICICIBANK', 'YESBANK', 'ntpc', 'TATAPOWER', 'ongc']
-            value = "Brandbucket Media & Technology Ltd."
+            print("Starting server")
+
+            # Preprocess the company name
             value = re.sub(r'\blimited\b', 'ltd', value, flags=re.IGNORECASE)
             value = re.sub(r'\band\b', '&', value, flags=re.IGNORECASE)
             print("Value (Stock name):", value)
-            
+
             # Select a random ticker
+            ticker = [
+                'RELIANCE', 'ITC', 'tcs', 'wipro', 'hcltech', 'TECHM', 'INFY', 'OFSS',
+                'HDFCBANK', 'ICICIBANK', 'YESBANK', 'ntpc', 'TATAPOWER', 'ongc'
+            ]
             random_ticker = random.choice(ticker)
             print("Randomly selected ticker:", random_ticker)
-            
+
             # Navigate to the page
             page.goto(f"https://ticker.finology.in/company/{random_ticker}")
 
@@ -53,11 +45,11 @@ def get_company_url(value):
                 page.wait_for_selector('[class="topsearchinner"]', timeout=30000)
                 page.locator('[class="topsearchinner"]').click()
                 page.locator('[id="txtSearchComp"]').type(value, delay=100)
-                
+
                 # Wait for dropdown and select
                 page.wait_for_selector('[class="list animated fadeInUp faster"]', timeout=30000)
                 page.locator('[class="list animated fadeInUp faster"]').nth(0).click()
-                
+
                 # Get the base URL after interaction
                 base_url = page.url
                 print("Extraction successful. Server URL:", base_url)
@@ -65,36 +57,43 @@ def get_company_url(value):
             except Exception as e:
                 print("Error occurred during element interaction:", str(e))
                 # Save a screenshot and page content for debugging
-                os.makedirs("debug", exist_ok=True)  # Ensure the debug folder exists
+                os.makedirs("debug", exist_ok=True)
                 screenshot_path = os.path.join("debug", "error_screenshot.png")
                 html_path = os.path.join("debug", "error_page.html")
-                
+
                 page.screenshot(path=screenshot_path)
                 with open(html_path, "w", encoding="utf-8") as f:
                     f.write(page.content())
-                
+
                 print(f"Screenshot saved at: {screenshot_path}")
                 print(f"HTML dump saved at: {html_path}")
+
                 financial_data = {
-                "Market Cap":"0",
-                "Enterprise Value":"0",
-                "Number of Shares":"0",
-                "P/E":"0",
-                "P/B":"0",
-                "Dividend Yield":"0",
-                "Cash":"0",
-                "Debt":"0",
-                "Promoter Holding": "0",
-                "Sales": "0",
-                "ROE": "0",
-                "ROCE": "0",
+                    "Market Cap": "0",
+                    "Enterprise Value": "0",
+                    "Number of Shares": "0",
+                    "P/E": "0",
+                    "P/B": "0",
+                    "Dividend Yield": "0",
+                    "Cash": "0",
+                    "Debt": "0",
+                    "Promoter Holding": "0",
+                    "Sales": "0",
+                    "ROE": "0",
+                    "ROCE": "0",
                 }
-                print(f"The playwright couldn't find anything, likely because the data isn't available. If it's waiting for a locator, that might be the issue:{e}")
                 return "no data", "no data", financial_data
-            browser.close()
+            finally:
+                browser.close()
 
     except Exception as e:
         print("Error occurred:", str(e))
+        return "no data", "no data", {}
+
+    # If base_url is not assigned, exit early
+    if not base_url:
+        print("Base URL not found. Exiting.")
+        return "no data", "no data", {}
 
     response = requests.get(base_url)
     soup = BeautifulSoup(response.text, 'html.parser')

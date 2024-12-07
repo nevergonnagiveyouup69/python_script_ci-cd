@@ -16,6 +16,8 @@ jobs:
       MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
       SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
       RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+      API_KEY_GEN: ${{ secrets.API_KEY_GEN }}
+      API_KEY_GEN_2: ${{ secrets.API_KEY_GEN_2 }}
 
     steps:
     - uses: actions/checkout@v4
@@ -36,6 +38,9 @@ jobs:
           pip install google-generativeai
           pip install fpdf
           pip install playwright
+
+    - name: Install Playwright browsers
+      run: playwright install
 
     - name: Run the Python script
       run: python3 script.py

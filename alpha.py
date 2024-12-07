@@ -13,6 +13,7 @@ def get_company_url(company_name):
     query = f"{company_name} stock ticker"
     for result in search(query, num_results=5):
         if "finology" in result:
+            print(result)
 
             response = requests.get(result)
             soup = BeautifulSoup(response.text, 'html.parser')

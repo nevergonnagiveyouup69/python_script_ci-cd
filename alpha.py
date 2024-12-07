@@ -7,6 +7,10 @@ import random
 import os
 import re
 import google.generativeai as genai
+from playwright_stealth import stealth_sync
+
+
+
 # from sklearn.feature_extraction.text import CountVectorizer
 # from sklearn.metrics.pairwise import cosine_similarity
 # from nltk.metrics import edit_distance
@@ -22,7 +26,10 @@ def get_company_url(value):
         with sync_playwright() as p:
 
             # Launch the browser
-            browser = p.chromium.launch(headless=True)  # Use headless=True for silent execution
+            browser = playwright.chromium.launch(headless=False)
+            context = browser.new_context()
+            stealth_sync(context)
+            page = context.new_page()
             print("Starting server")
             page = browser.new_page()
 

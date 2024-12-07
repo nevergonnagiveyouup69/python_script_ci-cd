@@ -1,3 +1,6 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
 name: Python application
 
 on:
@@ -14,7 +17,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
+    env:  # Add secrets as environment variables
       MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
       SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
       RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
@@ -32,23 +35,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Install additional dependencies
+    - name: Install dependencies
       run: |
-        pip install requests
-        pip install beautifulsoup4
-        pip install python-dotenv
-        pip install google-generativeai
-        pip install fpdf
-        pip install playwright
-        pip install playwright-stealth
-    - name: Install Playwright browsers
-      run: playwright install
+          pip install requests
+          pip install beautifulsoup4
+          pip install python-dotenv
+          pip install google-generativeai
+          pip install fpdf
+          pip install googlesearch-python
+
     - name: Run the Python script
       run: python3 alpha.py
-    - name: Upload debug artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: debug-files
-        path: ./debug/
-        if-no-files-found: warn
-    

@@ -44,8 +44,10 @@ jobs:
       run: playwright install
     - name: Run the Python script
       run: python3 alpha.py
-    - name: Upload artifacts (images or logs)
+    - name: Upload debug artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: generated-images
-        path: ./outputs/images/
+        name: debug-files
+        path: ./debug/
+        if-no-files-found: warn
+    

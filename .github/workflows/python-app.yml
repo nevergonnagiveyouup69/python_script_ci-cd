@@ -40,7 +40,7 @@ jobs:
         pip install google-generativeai
         pip install fpdf
         pip install playwright
-        pip install stealth_sync
+        pip install playwright-stealth
     - name: Install Playwright browsers
       run: playwright install
     - name: Run the Python script

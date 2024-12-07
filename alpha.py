@@ -98,6 +98,8 @@ def get_company_url(company_name):
             response2 = model2.generate_content("Summarize the profitability of this investment in one word: 'Low,' 'Moderate,' 'High,' 'Very High,' or 'None'."+str(after_reports_items)+"fundamentals"+str(financial_data))
             profits = response2.text
             print("Extraction Completed.\n")
-            # print(financial_data)
-            # print("profits:"+ profits)
+            print(financial_data)
+            print("profits:"+ profits)
             return profits, generated_text, financial_data
+        
+get_company_url("Brandbucket Media & Technology Ltd")

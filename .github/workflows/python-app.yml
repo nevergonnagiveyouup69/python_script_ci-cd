@@ -48,5 +48,5 @@ jobs:
       run: playwright install
 
     - name: Run the Python script
-      run: python3 script.py
+      run: python3 alpha.py
 

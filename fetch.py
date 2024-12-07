@@ -105,10 +105,21 @@ def make_pdf():
         analysis_value = get_company_url(company)
 
         # Configure GenAI
-        genai.configure(api_key=os.getenv('API_KEY_GEN'))
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(f"I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}")
-        total_analysis = response.text
+        
+        if analysis_value and len(analysis_value) > 1:
+            genai.configure(api_key=os.getenv('API_KEY_GEN'))
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            try:
+                response = model.generate_content(
+                    f"I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
+                )
+                total_analysis = response.text
+            except Exception as e:
+                print(f"Error generating analysis for {company}: {e}")
+                total_analysis = "Analysis could not be generated."
+        else:
+            print(f"Invalid or incomplete data for company {company}: {analysis_value}")
+            total_analysis = "No valid data available for analysis."
 
         # Add a new page for each company
         pdf.add_page()

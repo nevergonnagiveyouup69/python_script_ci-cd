@@ -15,7 +15,7 @@ def get_company_url(company_name):
         if "finology" in result:
 
             print("result"+result)
-            response = requests.get(result)
+            response = requests.get("https://ticker.finology.in/company/SCRIP-303692")
             soup = BeautifulSoup(response.text, 'html.parser')
             print("\nStarting extraction:")
             # Find all list items within the content

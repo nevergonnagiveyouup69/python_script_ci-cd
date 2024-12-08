@@ -100,4 +100,6 @@ def get_company_url(company_name):
             print("Extraction Completed.\n")
             print(financial_data)
             print("profits:"+ profits)
-            return profits, generated_text, financial_dat
+            return profits, generated_text, financial_data
+        
+get_company_url("Brandbucket Media & Technology Ltd")

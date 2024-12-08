@@ -1,10 +1,10 @@
+from googlesearch import search
 from bs4 import BeautifulSoup
 import requests
 import random
 import os
 import re
 import google.generativeai as genai
-from googlesearch import search
 
 def get_company_url(company_name):
     """
@@ -14,8 +14,12 @@ def get_company_url(company_name):
     for result in search(query, num_results=5):
         if "finology" in result:
 
-            print("result"+result)
-            response = requests.get("https://ticker.finology.in/company/SCRIP-303692")
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'
+            }
+
+            response = requests.get(result, headers=headers)
+            response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             print("\nStarting extraction:")
             # Find all list items within the content

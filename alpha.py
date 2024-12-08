@@ -14,6 +14,7 @@ def get_company_url(company_name):
     for result in search(query, num_results=5):
         if "finology" in result:
 
+            print("result"+result)
             response = requests.get(result)
             soup = BeautifulSoup(response.text, 'html.parser')
             print("\nStarting extraction:")

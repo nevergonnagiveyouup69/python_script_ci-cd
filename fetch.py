@@ -137,7 +137,7 @@ def make_pdf():
 
         for key, value in data[2].items():
             pdf.cell(50, 10, key, border=0)
-            pdf.cell(100, 10, value, border=0)
+            pdf.cell(100, 10, str(value), border=0)
             pdf.ln(10)  # Move to the next row
             pdf.line(10, pdf.get_y(), 200, pdf.get_y())  # Add a horizontal line for each row
 
@@ -164,7 +164,7 @@ def make_pdf():
             pdf.cell(95, 10, key, border=1, align='L')
             color = get_text_color(key, value)
             pdf.set_text_color(*color)
-            pdf.cell(95, 10, value, border=1, align='L')
+            pdf.cell(95, 10, str(value), border=1, align='L')
             pdf.set_text_color(0, 0, 0) 
             pdf.ln()
             # Add additional spacing

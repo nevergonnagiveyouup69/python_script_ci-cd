@@ -12,7 +12,7 @@ def make_pdf():
     def get_text_color(key, value):
         try:
             # Remove symbols and convert to float for numeric comparison
-            clean_value = value.replace('₹', '').replace('Cr.', '').replace('%', '').strip()
+            clean_value = value
         except ValueError:
             # Return black for non-numeric or invalid data
             return (0, 0, 0)

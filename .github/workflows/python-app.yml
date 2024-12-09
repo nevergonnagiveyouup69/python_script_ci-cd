@@ -43,6 +43,7 @@ jobs:
           pip install google-generativeai
           pip install fpdf
           pip install googlesearch-python
+          pip install yfinance
 
     - name: Run the Python script
       run: python3 script.py

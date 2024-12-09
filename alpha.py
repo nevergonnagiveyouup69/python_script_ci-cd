@@ -1,6 +1,7 @@
 
 import google.generativeai as genai
 from finance import calculate_metrics
+import os
 
 def get_company_url(company_name):
         

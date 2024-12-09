@@ -155,19 +155,21 @@ def make_pdf():
         pdf.cell(95, 10, "Value", border=1, align='C', fill=True)
         pdf.ln()
 
-
-        # Add table rows with conditional coloring
-        for key, value in analysis_value[2].items():
-            # Get text color based on conditions
-            # Add key and value cells
-            pdf.set_text_color(0, 0, 0) 
-            pdf.cell(95, 10, key, border=1, align='L')
-            color = get_text_color(key, value)
-            pdf.set_text_color(*color)
-            pdf.cell(95, 10, str(value), border=1, align='L')
-            pdf.set_text_color(0, 0, 0) 
-            pdf.ln()
-            # Add additional spacing
+        if analysis_value and len(analysis_value) > 2 and analysis_value[2]:
+            for key, value in analysis_value[2].items():
+                 # Get text color based on conditions
+                # Add key and value cells
+                pdf.set_text_color(0, 0, 0) 
+                pdf.cell(95, 10, key, border=1, align='L')
+                color = get_text_color(key, value)
+                pdf.set_text_color(*color)
+                pdf.cell(95, 10, str(value), border=1, align='L')
+                pdf.set_text_color(0, 0, 0) 
+                pdf.ln()
+                # Add additional spacing
+        else:
+            print("analysis_value[2] is not available.")
+           
 
         pdf.ln(5)
 

@@ -146,7 +146,7 @@ def make_pdf():
                 pdf.set_text_color(252, 238, 167)  # Light Yellow
 
             pdf.cell(f"{analysis_value[0]}")
-            print("this shit:  "+analysis_value[0])
+            print("this shit:  "+str(analysis_value[0]))
         else:
             pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
         pdf.set_text_color(0, 0, 0)

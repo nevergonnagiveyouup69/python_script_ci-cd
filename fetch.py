@@ -145,7 +145,7 @@ def make_pdf():
             else:
                 pdf.set_text_color(252, 238, 167)  # Light Yellow
             # Ensure that `analysis_value[0]` is compatible
-            value = analysis_value[0]
+            value = analysis_value[0].strip()
 
             # Convert to string if it's not already
             if not isinstance(value, str):

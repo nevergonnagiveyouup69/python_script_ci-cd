@@ -146,7 +146,7 @@ def make_pdf():
                 pdf.set_text_color(252, 238, 167)  # Light Yellow
 
             pdf.cell(f"{analysis_value[0]}")
-            total = 0.0  # Initialize as float
+            total = "" # Initialize as float
             total += analysis_value[0]  # Ensure analysis_value[0] is a float
             print("this shit:  "+total)
         else:

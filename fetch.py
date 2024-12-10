@@ -148,6 +148,7 @@ def make_pdf():
             pdf.cell(0, 10, f"{analysis_value[0]}", ln=True, align='R')
         else:
             pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
+        pdf.set_text_color(0, 0, 0)
         pdf.ln(5)
 
         

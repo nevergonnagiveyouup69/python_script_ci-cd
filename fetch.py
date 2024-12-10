@@ -136,11 +136,11 @@ def make_pdf():
 
         pdf.set_font('DancingScript', size=14)
         if analysis_value and isinstance(analysis_value[0], str):
-            if analysis_value[0] in ['Low', 'None']:
+            if analysis_value[0].strip() in ['Low', 'None']:
                 pdf.set_text_color(197, 24, 7)  # Red
-            elif analysis_value[0] == 'High':
+            elif analysis_value[0].strip() == 'High':
                 pdf.set_text_color(144, 238, 144)  # Light Green
-            elif analysis_value[0] == 'Very High':
+            elif analysis_value[0].strip() == 'Very High':
                 pdf.set_text_color(32, 178, 170)  # Light Sea Green
             else:
                 pdf.set_text_color(252, 238, 167)  # Light Yellow

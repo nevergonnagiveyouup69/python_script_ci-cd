@@ -144,8 +144,16 @@ def make_pdf():
                 pdf.set_text_color(32, 178, 170)  # Light Sea Green
             else:
                 pdf.set_text_color(252, 238, 167)  # Light Yellow
+            # Ensure that `analysis_value[0]` is compatible
+            value = analysis_value[0]
 
-            pdf.cell(f"{analysis_value[0]}")
+            # Convert to string if it's not already
+            if not isinstance(value, str):
+                value = str(value)
+
+            # Add a cell to the PDF
+            pdf.cell(w=10, txt=value)  # Replace `w=10` with the appropriate width
+
         else:
             pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
         pdf.set_text_color(0, 0, 0)

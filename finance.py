@@ -114,4 +114,3 @@ def calculate_metrics(company_name):
         print(f"Error fetching fundamental data for {ticker}: {e}")
         return None
     
-calculate_metrics("VSL.BO")

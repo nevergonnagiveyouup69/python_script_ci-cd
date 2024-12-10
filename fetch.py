@@ -2,8 +2,8 @@ from datetime import datetime
 from script import fetch_data
 from alpha import get_company_url
 import time
-from fpdf import FPDF
-import google.generativeai as genai
+from fpdf import FPDF # type: ignore
+import google.generativeai as genai # type: ignore
 import os
 import datetime
 
@@ -111,7 +111,7 @@ def make_pdf():
             model = genai.GenerativeModel("gemini-1.5-flash")
             try:
                 response = model.generate_content(
-                    f"I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
+                    f"Pretend you are professional analyst. I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
                 )
                 total_analysis = response.text
             except Exception as e:
@@ -130,6 +130,26 @@ def make_pdf():
         pdf.set_font('Secular', size=14) 
         pdf.cell(0, 10, f"Company: {company}", ln=True, align='L')
         pdf.ln(5)
+
+        pdf.set_font('Secular', size=14)
+        pdf.cell(0, 10, "Profitability:", ln=True, align='L')
+
+        pdf.set_font('DancingScript', size=14)
+        if analysis_value and isinstance(analysis_value[0], str):
+            if analysis_value[0] in ['Low', 'None']:
+                pdf.set_text_color(197, 24, 7)  # Red
+            elif analysis_value[0] == 'High':
+                pdf.set_text_color(144, 238, 144)  # Light Green
+            elif analysis_value[0] == 'Very High':
+                pdf.set_text_color(32, 178, 170)  # Light Sea Green
+            else:
+                pdf.set_text_color(252, 238, 167)  # Light Yellow
+
+            pdf.cell(0, 10, f"{analysis_value[0]}", ln=True, align='R')
+        else:
+            pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
+        pdf.ln(5)
+
         
         # Add a separator for visual clarity
         pdf.set_draw_color(200, 200, 200)  # Light gray

@@ -1,5 +1,5 @@
 
-import google.generativeai as genai
+import google.generativeai as genai # type: ignore
 from finance import calculate_metrics
 import os
 

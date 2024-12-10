@@ -1,5 +1,5 @@
-import yfinance as yf
-from googlesearch import search
+import yfinance as yf # type: ignore
+from googlesearch import search # type: ignore
 import re
 
 def calculate_metrics(company_name):

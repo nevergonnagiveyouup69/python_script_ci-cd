@@ -12,8 +12,8 @@ def make_pdf():
     def get_text_color(key, value):
         try:
             # Remove symbols and convert to float for numeric comparison
-            clean_value = value
-        except ValueError:
+            clean_value = float(value)
+        except (ValueError, TypeError):
             # Return black for non-numeric or invalid data
             return (0, 0, 0)
         

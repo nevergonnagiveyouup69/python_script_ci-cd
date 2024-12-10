@@ -132,9 +132,8 @@ def make_pdf():
         pdf.ln(5)
 
         pdf.set_font('Secular', size=14)
-        pdf.cell(0, 10, "Profitability:", ln=True, align='L')
+        pdf.cell(w=40, txt="Profitability: ", ln=0) 
 
-        pdf.set_font('DancingScript', size=14)
         if analysis_value and isinstance(analysis_value[0], str):
             if analysis_value[0].strip() in ['Low', 'None']:
                 pdf.set_text_color(197, 24, 7)  # Red
@@ -156,6 +155,7 @@ def make_pdf():
 
         else:
             pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
+        pdf.set_font('DancingScript', size=14)
         pdf.set_text_color(0, 0, 0)
         pdf.ln(5)
 

@@ -166,11 +166,22 @@ def make_pdf():
 
         # Access the data for ex:'Paisalo Digital Ltd.'
         acquisition_data = grouped_data[company]
+  
+        if len(acquisition_data) > 1:
+            acquisition_record = {
+                'Company Name': acquisition_data[0]['Company Name'],
+                'Acquisitions': str(len(acquisition_data)),
+                'Date': ', '.join(record['Date'] for record in acquisition_data),
+                'Price': acquisition_data[0]['Price'],
+                'Quantity': ', '.join(record['Quantity'] for record in acquisition_data),
+                'Percentage Change': ', '.join(record['Percentage Change'] for record in acquisition_data),
+                'Action': acquisition_data[0]['Action'],
+                'Value': ', '.join(record['Value'] for record in acquisition_data)
+            }
+        else:
+            acquisition_record = acquisition_data[0]
 
-        # Access the first record if multiple exist
-        first_acquisition_record = acquisition_data[0]
-
-        for key, value in first_acquisition_record.items():
+        for key, value in acquisition_record.items():
             pdf.cell(50, 10, key, border=0)
             pdf.cell(100, 10, str(value), border=0)
             pdf.ln(10)  # Move to the next row

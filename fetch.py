@@ -164,7 +164,13 @@ def make_pdf():
         pdf.set_draw_color(200, 200, 200)  # Light gray
         pdf.line(10, pdf.get_y(), 200, pdf.get_y())
 
-        for key, value in data[2].items():
+        # Access the data for ex:'Paisalo Digital Ltd.'
+        acquisition_data = grouped_data[company]
+
+        # Access the first record if multiple exist
+        first_acquisition_record = acquisition_data[0]
+
+        for key, value in first_acquisition_record.items():
             pdf.cell(50, 10, key, border=0)
             pdf.cell(100, 10, str(value), border=0)
             pdf.ln(10)  # Move to the next row

@@ -5,6 +5,7 @@ import re
 def calculate_metrics(company_name):
     try:
         # Fetch stock data
+        ticker = None
         query = f"{company_name} stock ticker yahoo"
         for result in search(query, num_results=5):
             if "finance" in result or "yahoo" in result:

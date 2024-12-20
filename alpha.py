@@ -4,6 +4,14 @@ import google.generativeai as genai # type: ignore
 from finance import calculate_metrics
 import os
 
+def profits_chance(financial_data):
+        genai.configure(api_key=os.getenv('API_KEY_GEN_3'))
+        model2 = genai.GenerativeModel("gemini-1.5-flash")
+        response2 = model2.generate_content("Summarize the profitability of this investment in one word: 'Low,' 'Moderate,' 'High,' 'Very High,' or 'None'.fundamentals"+str(financial_data))
+        profits = response2.text
+        return profits
+
+
 def get_company_url(company_name):
         max_retries = 5  # Maximum number of retries
         retry_wait = 60  # Wait time in seconds (1 minute)
@@ -15,11 +23,7 @@ def get_company_url(company_name):
                         model = genai.GenerativeModel("gemini-1.5-flash", generation_config={"temperature": 0.2})
                         response = model.generate_content("I want you to analyze the data and provide a financial analysis (profitability) of this in single paragraph no highlights fundamentals"+str(financial_data))
                         generated_text = response.text
-                        
-                        genai.configure(api_key=os.getenv('API_KEY_GEN_3'))
-                        model2 = genai.GenerativeModel("gemini-1.5-flash")
-                        response2 = model2.generate_content("Summarize the profitability of this investment in one word: 'Low,' 'Moderate,' 'High,' 'Very High,' or 'None'.fundamentals"+str(financial_data))
-                        profits = response2.text
+                        profits = profits_chance(financial_data)
                         print("Extraction Completed.\n")
                         print(financial_data)
                         # print("profits:"+ profits)

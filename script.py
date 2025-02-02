@@ -134,7 +134,7 @@ def fetch_data_ipo():
 
                     if "Open" in company_name or "Upcoming" in company_name:
                         entry = {
-                            "Company Name": company_name,
+                            # "Company Name": company_name,
                             "Price":cols[1].text.strip(),
                             "GMP": cols[2].text.strip(),
                             "Est Listing": cols[3].text.strip(),
@@ -303,7 +303,7 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Fetch stock data
-    stock_data_ipo = "None"
+    stock_data_ipo = fetch_data_ipo()
 
     # Generate the HTML table based on the data
     html_table_ipo = create_html_ipo(stock_data_ipo)

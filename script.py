@@ -303,7 +303,7 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Fetch stock data
-    stock_data_ipo = fetch_data_ipo()
+    stock_data_ipo = "None"
 
     # Generate the HTML table based on the data
     html_table_ipo = create_html_ipo(stock_data_ipo)

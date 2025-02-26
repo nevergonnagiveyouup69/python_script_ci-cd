@@ -4,6 +4,7 @@ from alpha import get_company_url
 import time
 from fpdf import FPDF # type: ignore
 import google.generativeai as genai # type: ignore
+import random
 import os
 import datetime
 
@@ -107,13 +108,35 @@ def make_pdf():
         # Configure GenAI
         
         if analysis_value and len(analysis_value) > 1:
-            genai.configure(api_key=os.getenv('API_KEY_GEN'))
-            model = genai.GenerativeModel("gemini-1.5-flash")
             try:
-                response = model.generate_content(
-                    f"Pretend you are professional analyst. I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
-                )
-                total_analysis = response.text
+                genai.configure(api_key=os.getenv('API_KEY_GEN'))
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                
+                # Implement rate limiting
+                max_retries = 5
+                retry_count = 0
+                
+                while retry_count < max_retries:
+                    try:
+                        response = model.generate_content(
+                            f"Pretend you are professional analyst. I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
+                        )
+                        total_analysis = response.text
+                        break  # Success, exit loop
+                    except Exception as e:
+                        if "429" in str(e):  # Rate limit error
+                            retry_count += 1
+                            wait_time = 2 ** retry_count  # Exponential backoff
+                            print(f"Rate limit hit for {company}, waiting {wait_time}s, attempt {retry_count}/{max_retries}")
+                            time.sleep(wait_time + random.uniform(0, 1))  # Add jitter
+                        else:
+                            print(f"Error generating analysis for {company}: {e}")
+                            total_analysis = "Analysis error: " + str(e)
+                            break
+                
+                if retry_count >= max_retries:
+                    total_analysis = "Analysis could not be generated due to rate limits."
+                    
             except Exception as e:
                 print(f"Error generating analysis for {company}: {e}")
                 total_analysis = "Analysis could not be generated."

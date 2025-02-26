@@ -44,6 +44,7 @@ jobs:
           pip install fpdf
           pip install googlesearch-python
           pip install yfinance
+          pip install tenacity
 
     - name: Run the Python script
       run: python3 script.py

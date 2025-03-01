@@ -205,6 +205,7 @@ def send_email(recipient_name, html_table, html_table_ipo):
         raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
  
     stock_data_ipo = len(fetch_data_ipo())
+    print("stock start!")
     stock_data = len(fetch_data())
 
     green= "#20B2AA"
@@ -268,6 +269,7 @@ def send_email(recipient_name, html_table, html_table_ipo):
         </body>
         </html>"""
 
+    print("stock !")
     message = MIMEMultipart("alternative")
     message["From"] = sender_email
     message["To"] = recipient_email

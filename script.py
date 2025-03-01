@@ -199,6 +199,8 @@ def send_email(recipient_name, html_table, html_table_ipo):
     recipient_email = os.getenv('RECIPIENT_EMAIL')
     password = os.getenv('MY_PASSWORD')
     email_subject = "Daily Market Update"
+
+    print("Email start!")
     if not password:
         raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
  
@@ -273,6 +275,7 @@ def send_email(recipient_name, html_table, html_table_ipo):
     message.attach(MIMEText(html_body, "html"))
 
     pdf_path ='pdf/company_analysis_report.pdf'
+    print("Email start!")
     # Attach PDF if provided
     if pdf_path:
         try:
@@ -288,6 +291,7 @@ def send_email(recipient_name, html_table, html_table_ipo):
         except Exception as e:
             print(f"Error attaching PDF: {e}")
 
+    print("Email start!")
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, password)

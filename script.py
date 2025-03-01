@@ -115,8 +115,9 @@ def fetch_data_ipo():
         # Find the table
         table = soup.find("table", {"id": "mainTable"})  # Adjust if a different attribute is needed
         if not table:
+            extracted_data = []
             print("Table not found on the page.")
-            return None
+            return extracted_data
 
         # Extract data from table rows and columns
         extracted_data = []

@@ -116,7 +116,7 @@ def fetch_data_ipo():
         table = soup.find("table", {"id": "mainTable"})  # Adjust if a different attribute is needed
         if not table:
             print("Table not found on the page.")
-            exit()
+            return None
 
         # Extract data from table rows and columns
         extracted_data = []
@@ -199,13 +199,10 @@ def send_email(recipient_name, html_table, html_table_ipo):
     recipient_email = os.getenv('RECIPIENT_EMAIL')
     password = os.getenv('MY_PASSWORD')
     email_subject = "Daily Market Update"
-
-    print("Email start!")
     if not password:
         raise ValueError("Environment variable MY_PASSWORD is not set. Please set it before running the script.")
  
     stock_data_ipo = len(fetch_data_ipo())
-    print("stock start!")
     stock_data = len(fetch_data())
 
     green= "#20B2AA"
@@ -269,7 +266,6 @@ def send_email(recipient_name, html_table, html_table_ipo):
         </body>
         </html>"""
 
-    print("stock !")
     message = MIMEMultipart("alternative")
     message["From"] = sender_email
     message["To"] = recipient_email
@@ -277,7 +273,6 @@ def send_email(recipient_name, html_table, html_table_ipo):
     message.attach(MIMEText(html_body, "html"))
 
     pdf_path ='pdf/company_analysis_report.pdf'
-    print("Email start!")
     # Attach PDF if provided
     if pdf_path:
         try:
@@ -293,7 +288,6 @@ def send_email(recipient_name, html_table, html_table_ipo):
         except Exception as e:
             print(f"Error attaching PDF: {e}")
 
-    print("Email start!")
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, password)

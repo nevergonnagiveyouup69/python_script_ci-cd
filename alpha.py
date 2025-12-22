@@ -37,7 +37,7 @@ def get_company_url(company_name):
             # Get the profitability word (Low/Moderate/High/etc.)
             profits = profits_chance(financial_data)
 
-            print("Extraction Completed.\n")
+            print("Extraction Completed. \n")
             print(financial_data)
 
             return profits, generated_text, financial_data

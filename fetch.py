@@ -2,27 +2,23 @@ from datetime import datetime
 from script import fetch_data
 from alpha import get_company_url
 import time
-from fpdf import FPDF # type: ignore
-import google.generativeai as genai # type: ignore
+from fpdf import FPDF  # type: ignore
 import random
 import os
-import datetime
+
+# Import the correct SDK
+from google import genai  # type: ignore
 
 def make_pdf():
-    # Define conditions for each field
     def get_text_color(key, value):
         try:
-            # Remove symbols and convert to float for numeric comparison
             clean_value = float(value)
         except (ValueError, TypeError):
-            # Return black for non-numeric or invalid data
             return (0, 0, 0)
-        
-        # Conditional logic for specific fields
         if key == "Debt":
             return (255, 0, 0) if clean_value >= 0 else (0, 255, 0)
         elif key == "P/E":
-            return (255, 0, 0) if 15 > clean_value > 25 else (0, 255, 0)
+            return (255, 0, 0) if clean_value < 15 or clean_value > 25 else (0, 255, 0)
         elif key == "P/B":
             return (255, 0, 0) if clean_value > 3 else (0, 255, 0)
         elif key == "Dividend Yield":
@@ -38,231 +34,142 @@ def make_pdf():
         elif key == "ROCE":
             return (0, 255, 0) if clean_value > 15 else (255, 0, 0)
         else:
-            # Default black for other fields
             return (0, 0, 0)
-            
-    # Subclass FPDF for footer implementation
+
     class PDFWithFooter(FPDF):
         def footer(self):
-            # Skip numbering the title page (first page)
             if self.page_no() > 1:
-                self.set_y(-15)  # Position footer at 15mm from the bottom
+                self.set_y(-15)
                 self.set_font('DejaVu', size=8)
-                self.cell(0, 10, f"Page {self.page_no() - 1}", align='C')  # Adjust page number
+                self.cell(0, 10, f"Page {self.page_no() - 1}", align='C')
 
-
-    # Start the timer
     start_time = time.time()
-
-    # Initialize the PDF
     pdf = PDFWithFooter()
     pdf.set_auto_page_break(auto=True, margin=15)
-    # Add a title page
+
     pdf.add_page()
-    # Get page dimensions
-    page_width = pdf.w
-    page_height = pdf.h
+    pdf.image("screenshots/without_bg.jpg", x=0, y=0, w=pdf.w, h=pdf.h)
 
-    # Place the image as full-page background
-    pdf.image("screenshots/without_bg.jpg", x=0, y=0, w=page_width, h=page_height)
-
-    # Add custom fonts
     pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
     pdf.add_font('DancingScript', '', 'fonts/DancingScript-VariableFont_wght.ttf', uni=True)
     pdf.add_font('Secular', '', 'fonts/SecularOne-Regular.ttf', uni=True)
     pdf.add_font('pirataone', '', 'fonts/PirataOne-Regular.ttf', uni=True)
 
-    # Title Section
-    pdf.set_font('pirataone', size=65)  # Reduced font size
-    pdf.set_text_color(0, 0, 0)  # Set black color for the title
-
-    # Add spacing and properly center the title
-    pdf.cell(0, 40, "", ln=True)  # Add vertical space
-    pdf.multi_cell(0, 20, "Company", align='C')  # Multi-line title to ensure wrapping
-
-    pdf.set_font('pirataone', size=85)  # Reduced font size
-    pdf.set_text_color(0, 0, 0)  # Set black color for the title
-    pdf.cell(0, 5, "", ln=True)  # Add vertical space
-    pdf.multi_cell(0, 20, "Analysis Report", align='C')  # Multi-line title to ensure wrapping
-
-    # Subtitle Section
-    pdf.ln(10)  # Add spacing between title and subtitle
-    pdf.set_font('Secular', size=25)  # Helvetica is a core font similar to Arial
-    pdf.set_text_color(0, 0, 0)  # Black color for the rest of the text
-    pdf.cell(0, 10, f"{datetime.datetime.now().strftime('%B %d, %Y')}", ln=True, align='C')  # Centered date
+    pdf.set_font('pirataone', size=65)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(0, 40, "", ln=True)
+    pdf.multi_cell(0, 20, "Company", align='C')
+    pdf.set_font('pirataone', size=85)
+    pdf.cell(0, 5, "", ln=True)
+    pdf.multi_cell(0, 20, "Analysis Report", align='C')
     pdf.ln(10)
 
-    # Fetch data
+    pdf.set_font('Secular', size=25)
+    pdf.cell(0, 10, f"{datetime.now().strftime('%B %d, %Y')}", ln=True, align='C')
+    pdf.ln(10)
+
     data = fetch_data()
     grouped_data = {}
-
-    # Group data by Company Name
     for record in data:
         company_name = record['Company Name']
         grouped_data.setdefault(company_name, []).append(record)
 
-    # Generate analysis for each company
+    # Init GenAI client
+    client = genai.Client(api_key=os.getenv("API_KEY_GEN"))
+
     for company, acquisitions in grouped_data.items():
         analysis_value = get_company_url(company)
 
-        # Configure GenAI
-        
-        if analysis_value and len(analysis_value) > 1:
-            try:
-                genai.configure(api_key=os.getenv('API_KEY_GEN'))
-                model = genai.GenerativeModel("gemini-1.5-flash")
-                
-                # Implement rate limiting
-                max_retries = 5
-                retry_count = 0
-                
-                while retry_count < max_retries:
-                    try:
-                        response = model.generate_content(
-                            f"Pretend you are professional analyst. I want you to analyze the insider data of this stock and give a one-paragraph explanation if it is worth investing today: {acquisitions}\nFundamental: {analysis_value[1]}"
-                        )
-                        total_analysis = response.text
-                        break  # Success, exit loop
-                    except Exception as e:
-                        if "429" in str(e):  # Rate limit error
-                            retry_count += 1
-                            wait_time = 2 ** retry_count  # Exponential backoff
-                            print(f"Rate limit hit for {company}, waiting {wait_time}s, attempt {retry_count}/{max_retries}")
-                            time.sleep(wait_time + random.uniform(0, 1))  # Add jitter
-                        else:
-                            print(f"Error generating analysis for {company}: {e}")
-                            total_analysis = "Analysis error: " + str(e)
-                            break
-                
-                if retry_count >= max_retries:
-                    total_analysis = "Analysis could not be generated due to rate limits."
-                    
-            except Exception as e:
-                print(f"Error generating analysis for {company}: {e}")
-                total_analysis = "Analysis could not be generated."
-        else:
-            print(f"Invalid or incomplete data for company {company}: {analysis_value}")
-            total_analysis = "No valid data available for analysis."
+        # Generate insider data analysis text
+        total_analysis = "No analysis available."
+        if acquisitions and analysis_value and len(analysis_value) > 1:
+            prompt_text = (
+                "Pretend you are a professional analyst. "
+                "Provide a concise one-paragraph explanation "
+                "if this company is worth investing in today based on insider acquisition data: "
+                f"{acquisitions}\nFundamental: {analysis_value[1]}"
+            )
 
-        # Add a new page for each company
+            max_retries = 5
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    resp = client.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=prompt_text
+                    )
+                    total_analysis = resp.text.strip()
+                    break
+                except Exception as e:
+                    if "429" in str(e):
+                        retry_count += 1
+                        wait_time = 2 ** retry_count
+                        print(f"Rate limit for {company}, waiting {wait_time}s ({retry_count}/{max_retries})")
+                        time.sleep(wait_time + random.uniform(0, 1))
+                    else:
+                        print(f"Error generating analysis for {company}: {e}")
+                        total_analysis = "Analysis error: " + str(e)
+                        break
+
+        # Add new PDF page and content
         pdf.add_page()
-        pdf.set_draw_color(200, 200, 200)  # Light gray
+        pdf.set_draw_color(200, 200, 200)
         pdf.line(10, pdf.get_y(), 200, pdf.get_y())
 
-        # Add company name as a header
-        pdf.set_font('Secular', size=14) 
-        pdf.cell(0, 10, f"Company: {company}", ln=True, align='L')
-        pdf.ln(5)
-
         pdf.set_font('Secular', size=14)
-        pdf.cell(w=40, txt="Profitability: ", ln=0) 
+        pdf.cell(0, 10, f"Company: {company}", ln=True)
+        pdf.ln(5)
+        pdf.cell(40, 10, "Profitability: ", ln=0)
 
         if analysis_value and isinstance(analysis_value[0], str):
-            if analysis_value[0].strip() in ['Low', 'None']:
-                pdf.set_text_color(197, 24, 7)  # Red
-            elif analysis_value[0].strip() == 'High':
-                pdf.set_text_color(144, 238, 144)  # Light Green
-            elif analysis_value[0].strip() == 'Very High':
-                pdf.set_text_color(32, 178, 170)  # Light Sea Green
-            else:
-                pdf.set_text_color(252, 238, 167)  # Light Yellow
-            # Ensure that `analysis_value[0]` is compatible
-            value = analysis_value[0].strip()
-
-            # Convert to string if it's not already
-            if not isinstance(value, str):
-                value = str(value)
-
-            # Add a cell to the PDF
-            pdf.cell(w=10, txt=value)  # Replace `w=10` with the appropriate width
-
+            val = analysis_value[0].strip()
+            color = (0, 0, 0)
+            if val in ["Low", "None"]:
+                color = (197, 24, 7)
+            elif val == "High":
+                color = (144, 238, 144)
+            elif val == "Very High":
+                color = (32, 178, 170)
+            pdf.set_text_color(*color)
+            pdf.cell(10, 10, val)
         else:
-            pdf.cell(0, 10, "N/A", ln=True, align='R')  # Fallback if invalid
-        pdf.set_font('DancingScript', size=14)
+            pdf.cell(0, 10, "N/A", ln=True)
+
         pdf.set_text_color(0, 0, 0)
         pdf.ln(5)
 
-        
-        # Add a separator for visual clarity
-        pdf.set_draw_color(200, 200, 200)  # Light gray
-        pdf.line(10, pdf.get_y(), 200, pdf.get_y())
-
-        # Access the data for ex:'Paisalo Digital Ltd.'
-        acquisition_data = grouped_data[company]
-  
-        if len(acquisition_data) > 1:
-            acquisition_record = {
-                'Company Name': acquisition_data[0]['Company Name'],
-                'Acquisitions': str(len(acquisition_data)),
-                'Date': ', '.join(record['Date'] for record in acquisition_data),
-                'Price': acquisition_data[0]['Price'],
-                'Quantity': ', '.join(record['Quantity'] for record in acquisition_data),
-                'Percentage Change': ', '.join(record['Percentage Change'] for record in acquisition_data),
-                'Action': acquisition_data[0]['Action'],
-                'Value': ', '.join(record['Value'] for record in acquisition_data)
-            }
-        else:
-            acquisition_record = acquisition_data[0]
-
-        for key, value in acquisition_record.items():
-            pdf.cell(50, 10, key, border=0)
-            pdf.cell(100, 10, str(value), border=0)
-            pdf.ln(10)  # Move to the next row
-            pdf.line(10, pdf.get_y(), 200, pdf.get_y())  # Add a horizontal line for each row
-
-        # Add Fundamental Analysis
         pdf.set_font('Secular', size=14)
         pdf.cell(0, 10, "Fundamental Analysis:", ln=True)
         pdf.set_font('DejaVu', size=10)
         pdf.multi_cell(0, 10, str(analysis_value[1]))
         pdf.ln(5)
 
-        # Add table header
         pdf.set_font('DejaVu', size=10)
-        pdf.set_fill_color(200, 220, 255)  # Light blue background for headers
-        pdf.cell(95, 10, "Metric", border=1, align='C', fill=True)
-        pdf.cell(95, 10, "Value", border=1, align='C', fill=True)
+        pdf.set_fill_color(200, 220, 255)
+        pdf.cell(95, 10, "Metric", 1, align='C', fill=True)
+        pdf.cell(95, 10, "Value", 1, align='C', fill=True)
         pdf.ln()
 
         if analysis_value and len(analysis_value) > 2 and analysis_value[2]:
             for key, value in analysis_value[2].items():
-                 # Get text color based on conditions
-                # Add key and value cells
-                pdf.set_text_color(0, 0, 0) 
-                pdf.cell(95, 10, key, border=1, align='L')
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(95, 10, key, border=1)
                 color = get_text_color(key, value)
                 pdf.set_text_color(*color)
-                pdf.cell(95, 10, str(value), border=1, align='L')
-                pdf.set_text_color(0, 0, 0) 
+                pdf.cell(95, 10, str(value), border=1)
+                pdf.set_text_color(0, 0, 0)
                 pdf.ln()
-                # Add additional spacing
-        else:
-            print("analysis_value[2] is not available.")
-           
 
         pdf.ln(5)
-
-        # Add Insider Data Analysis
         pdf.set_font('Secular', size=14)
         pdf.cell(0, 10, "Insider Data Analysis:", ln=True)
         pdf.set_font('DejaVu', size=10)
         pdf.multi_cell(0, 10, total_analysis)
         pdf.ln(5)
 
-
-        # Add table header
-        pdf.set_fill_color(200, 200, 200)  # Gray background for header
-        pdf.set_text_color(0, 0, 0)        # Black text
-
-    # Save the PDF
     output_path = "pdf/company_analysis_report.pdf"
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     pdf.output(output_path)
     print(f"PDF created successfully: {output_path}")
 
-    # End the timer
-    end_time = time.time()
-
-    # Calculate the duration
-    duration = end_time - start_time
-    print(f"The command took {duration:.6f} seconds to run.")
+    print(f"Took {time.time() - start_time:.2f} seconds")

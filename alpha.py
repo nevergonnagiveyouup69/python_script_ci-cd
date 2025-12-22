@@ -18,6 +18,9 @@ def get_company_url(company_name):
         try:
             # Calculate financial metrics
             financial_data = calculate_metrics(company_name)
+            if not financial_data:
+                print(f"No financial data found for {company_name}. Skipping analysis.")
+                return None
 
             # Prompt for full financial analysis
             prompt = (
@@ -28,7 +31,7 @@ def get_company_url(company_name):
 
             # Call the Gemini text model
             response = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=prompt,
             )
 

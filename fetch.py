@@ -95,7 +95,7 @@ def make_pdf():
             while retry_count < max_retries:
                 try:
                     resp = client.models.generate_content(
-                        model="gemini-2.0-flash",
+                        model="gemini-2.5-flash",
                         contents=prompt_text
                     )
                     total_analysis = resp.text.strip()

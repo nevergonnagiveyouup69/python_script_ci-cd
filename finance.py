@@ -3,9 +3,9 @@ from googlesearch import search # type: ignore
 import re
 
 def calculate_metrics(company_name):
+    ticker = None
     try:
         # Fetch stock data
-        ticker = None
         query = f"{company_name} stock ticker yahoo"
         for result in search(query, num_results=5):
             if "finance" in result or "yahoo" in result:
@@ -15,6 +15,8 @@ def calculate_metrics(company_name):
                     break
                 else:
                     raise ValueError(f"No valid ticker found for company {company_name}")
+        if not ticker:
+            raise ValueError(f"No valid ticker found for company {company_name}")
         stock = yf.Ticker(ticker)
 
         # Fetch financial data

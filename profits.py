@@ -16,9 +16,9 @@ def profits_chance(financial_data):
             f"Fundamentals: {financial_data}"
         )
 
-        # Call the Gemini model (choose an available text model, e.g., gemini-2.0-flash)
+        # Call the Gemini model (choose an available text model, e.g., gemini-2.5-flash)
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=prompt
         )
 

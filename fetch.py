@@ -80,6 +80,11 @@ def make_pdf():
     for company, acquisitions in grouped_data.items():
         analysis_value = get_company_url(company)
 
+        if analysis_value is None:
+            print("No data available for PDF generation. Exiting.")
+        else:
+            pdf.multi_cell(0, 10, str(analysis_value[1]))
+
         # Generate insider data analysis text
         total_analysis = "No analysis available."
         if acquisitions and analysis_value and len(analysis_value) > 1:

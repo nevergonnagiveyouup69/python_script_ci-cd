@@ -44,7 +44,7 @@ def calculate_metrics(company_name):
         total_assets = balance_sheet.loc["Total Assets"].iloc[0] if "Total Assets" in balance_sheet.index else 0
 
         # Calculate Capital Employed
-        capital_employed = total_assets - current_liabilities
+        capital_employed = total_assets - current_liabilities 
 
         # Fetch company info
         company_info = stock.info
